@@ -1,0 +1,17 @@
+# macOS
+.DS_Store
+
+# Editor and IDE state
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Local Helm/Argo CD configuration and overrides
+*.local.yaml
+*.local.yml
+
+# Temporary files
+*.tmp
+*.bak
