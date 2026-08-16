@@ -1,8 +1,3 @@
-qservImageName: ghcr.io/lsst/qserv:2026.8.1-rc2
-mariadbImageName: ghcr.io/lsst/qserv-mariadb:2026.8.1-rc2
-sslProxyImageName: qserv/mysql-proxy-ssl:latest
-ingestHelperImageName: ghcr.io/lsst/qserv-build-base:2026.8.1-rc2
-
 czars:
   tier: [dev-czar]
 
