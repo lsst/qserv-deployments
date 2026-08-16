@@ -1,0 +1,24 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: qserv-prod
+  namespace: argocd
+spec:
+  project: default
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: qserv-prod
+  sources:
+    - repoURL: ghcr.io/lsst/charts
+      chart: qserv
+      targetRevision: 2026.8.1-rc2-23-g750048b57
+      helm:
+        valueFiles:
+          - $values/deployments/usdf-qserv-prod/values.yaml
+    - repoURL: https://github.com/lsst/qserv-deployments.git
+      targetRevision: main
+      ref: values
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
