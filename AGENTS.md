@@ -3,9 +3,12 @@
 This repo is the gitops source of truth for deployed Qserv instances at USDF. It holds
 **no application code**: just one directory per deployment under `deployments/`, each
 with an Argo CD `Application` (`application.yaml`) and Helm values overrides
-(`values.yaml`). Argo CD watches `main` and reconciles — but **synchronization is
-intentionally manual**: merging here changes the *desired* state; a human reviews the
-diff in Argo CD and syncs.
+(`values.yaml`). A root "app of apps" (`bootstrap/app-of-apps.yaml`) auto-syncs
+the child Application CRs into the cluster on every push to `main`, so changes to
+`application.yaml` (e.g. `targetRevision` bumps) take effect without manual
+`kubectl apply`. However, **workload synchronization is intentionally manual**: the
+child apps have no auto-sync, so merging here changes the *desired* state but a human
+still reviews the diff in Argo CD and syncs the actual pods/services.
 
 Qserv itself — including the Helm chart (`deploy/helm/`) — lives in
 github.com/lsst/qserv, conventionally checked out as a sibling (`../qserv/`). See
@@ -30,9 +33,11 @@ state explicitly in the PR what happens to existing PVCs. Danger patterns:
   STS delete/recreate.
 - Reducing `workers.replicas` leaves the surplus PVCs behind (safe, but they must not
   be "cleaned up" casually — scaling back up rebinds them).
-- Never enable auto-sync or prune. Never suggest `helm uninstall`, `kubectl delete
-  sts`, or namespace deletion without a human explicitly confirming the fate of each
-  PVC by name.
+- Never enable auto-sync or prune **on the child (per-environment) Applications**.
+  The root app-of-apps has auto-sync enabled, but it only manages Application CRs in
+  the `argocd` namespace — it does not touch workload resources. Never suggest
+  `helm uninstall`, `kubectl delete sts`, or namespace deletion without a human
+  explicitly confirming the fate of each PVC by name.
 
 ## Making a deployment change
 
@@ -50,8 +55,11 @@ state explicitly in the PR what happens to existing PVCs. Danger patterns:
    `volumeClaimTemplates`, StatefulSet names, or labels/selectors. (For an exact
    render, pull the pinned chart: `helm template oci://ghcr.io/lsst/charts/qserv
    --version <targetRevision> -f ...`.)
-4. PR into `main`, stating the PVC impact. After merge, a human syncs in Argo CD.
-   Rollout runs smig schema-migration Jobs before the StatefulSets restart.
+4. PR into `main`, stating the PVC impact. After merge, the root app-of-apps
+   auto-syncs Application CR changes (e.g. `targetRevision` bumps) into the
+   cluster. A human then reviews the resulting workload diff in Argo CD and syncs
+   manually. Rollout runs smig schema-migration Jobs before the StatefulSets
+   restart.
 
 ## Environments
 
