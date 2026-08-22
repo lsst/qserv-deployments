@@ -15,7 +15,7 @@ spec:
     path: deployments
     directory:
       recurse: true
-      include: "application.yaml"
+      include: "{**/application.yaml}"
   syncPolicy:
     automated:
       prune: false
