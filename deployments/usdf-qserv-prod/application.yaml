@@ -12,7 +12,7 @@ spec:
   sources:
     - repoURL: ghcr.io/lsst/charts
       chart: qserv
-      targetRevision: 2026.8.4-rc1
+      targetRevision: 2026.8.5-rc1
       helm:
         valueFiles:
           - $values/deployments/usdf-qserv-prod/values.yaml
