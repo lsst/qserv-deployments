@@ -27,3 +27,8 @@ czarExternalService:
     - 134.79.0.0/16
     - 172.16.0.0/12
     - 172.24.49.51/32
+
+certManager:
+  enabled: true
+  dnsNames:
+    - qserv-prod.slac.stanford.edu
