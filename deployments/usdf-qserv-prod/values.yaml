@@ -1,5 +1,3 @@
-mode: mariadb-upgrade
-
 czars:
   tier: [prod-czar]
 
